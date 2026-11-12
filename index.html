@@ -1,0 +1,984 @@
+<!doctype html>
+<html lang="en" data-contrast="normal" data-motion="normal">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>AccessLearn AI — Accessible Classroom Learning</title>
+<style>
+:root {
+  --navy-900: #060c1c;
+  --navy-800: #0b1430;
+  --navy-700: #111d42;
+  --navy-600: #18275a;
+  --line: #22346e;
+  --blue-400: #4f8cff;
+  --blue-300: #7fb0ff;
+  --text: #e8eeff;
+  --text-dim: #a6b4d8;
+  --good: #3ddc97;
+  --warn: #ffc857;
+  --bad: #ff6b6b;
+  --radius: 14px;
+  --font-scale: 1;
+  color-scheme: dark;
+}
+
+:root[data-contrast="high"] {
+  --navy-900: #000000;
+  --navy-800: #000000;
+  --navy-700: #0a0a0a;
+  --navy-600: #141414;
+  --line: #ffffff;
+  --text: #ffffff;
+  --text-dim: #ffffff;
+  --blue-400: #ffd400;
+  --blue-300: #ffd400;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--navy-900);
+  color: var(--text);
+  font-family: "Segoe UI", system-ui, -apple-system, "Noto Sans", "Noto Sans Devanagari", sans-serif;
+  font-size: calc(16px * var(--font-scale));
+  line-height: 1.55;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: -40% 20% 55% -20%;
+  background: radial-gradient(closest-side, rgba(79, 140, 255, 0.18), transparent);
+  pointer-events: none;
+  z-index: 0;
+}
+
+:root[data-motion="reduce"] body::before { display: none; }
+
+a { color: var(--blue-300); }
+
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: 0;
+  background: var(--blue-400);
+  color: #04102c;
+  padding: 10px 16px;
+  z-index: 50;
+  border-radius: 0 0 var(--radius) 0;
+}
+.skip-link:focus { left: 0; }
+
+:focus-visible {
+  outline: 3px solid var(--blue-300);
+  outline-offset: 2px;
+}
+
+header.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: rgba(11, 20, 48, 0.86);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: .3px; }
+.brand .dot {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--blue-400);
+  box-shadow: 0 0 14px var(--blue-400);
+}
+.brand small { display: block; font-weight: 400; color: var(--text-dim); font-size: .72em; }
+
+main { position: relative; z-index: 1; max-width: 1180px; margin: 0 auto; padding: 22px 18px 80px; }
+
+.grid { display: grid; gap: 18px; }
+.grid.two { grid-template-columns: 1.3fr 1fr; }
+@media (max-width: 900px) { .grid.two { grid-template-columns: 1fr; } }
+
+.card {
+  background: linear-gradient(180deg, rgba(24, 39, 90, .55), rgba(11, 20, 48, .75));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+.card h2 { margin: 0 0 12px; font-size: 1.05em; letter-spacing: .4px; }
+.card h3 { margin: 16px 0 6px; font-size: .95em; color: var(--blue-300); }
+
+.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.spread { justify-content: space-between; }
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--navy-600);
+  color: var(--text);
+  padding: 9px 14px;
+  min-height: 42px;
+}
+button:hover:not(:disabled) { border-color: var(--blue-400); }
+button:disabled { opacity: .45; cursor: not-allowed; }
+button.primary { background: var(--blue-400); color: #04102c; border-color: var(--blue-400); font-weight: 650; }
+button.danger { background: #3a1320; border-color: #7d2437; color: #ffd7dd; }
+button.ghost { background: transparent; }
+
+input, select, textarea {
+  font: inherit;
+  background: var(--navy-800);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  width: 100%;
+  min-height: 42px;
+}
+textarea { min-height: 150px; resize: vertical; }
+label { display: block; font-size: .85em; color: var(--text-dim); margin-bottom: 4px; }
+.field { margin-bottom: 12px; }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: .78em; padding: 3px 10px; border-radius: 999px;
+  border: 1px solid var(--line); color: var(--text-dim);
+}
+.badge.live { color: #04102c; background: var(--good); border-color: var(--good); font-weight: 700; }
+.badge.demo { color: #2a1b00; background: var(--warn); border-color: var(--warn); font-weight: 700; }
+
+.caption-box {
+  min-height: 132px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: #040a18;
+  padding: 18px;
+  font-size: 1.35em;
+  line-height: 1.5;
+}
+.caption-box .interim { color: var(--text-dim); font-style: italic; }
+.caption-box .final { color: var(--text); }
+
+.transcript { max-height: 380px; overflow-y: auto; padding-right: 6px; }
+.segment {
+  border-left: 3px solid var(--navy-600);
+  padding: 7px 0 7px 12px;
+  margin-bottom: 8px;
+}
+.segment:hover { border-left-color: var(--blue-400); }
+.segment .time { color: var(--text-dim); font-size: .78em; font-variant-numeric: tabular-nums; }
+.segment .translated { color: var(--blue-300); font-size: .93em; display: block; margin-top: 3px; }
+mark { background: var(--warn); color: #241a00; border-radius: 3px; }
+
+ul.clean { list-style: none; margin: 0; padding: 0; }
+ul.clean li { padding: 8px 0; border-bottom: 1px solid var(--line); }
+ul.clean li:last-child { border-bottom: none; }
+
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.tabs button[aria-selected="true"] { background: var(--blue-400); color: #04102c; border-color: var(--blue-400); font-weight: 650; }
+
+.notice { border-left: 3px solid var(--warn); background: rgba(255, 200, 87, .08); padding: 10px 12px; border-radius: 0 10px 10px 0; font-size: .9em; }
+.error { border-left-color: var(--bad); background: rgba(255, 107, 107, .1); }
+
+.hint { color: var(--text-dim); font-size: .85em; }
+.hidden { display: none !important; }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+footer { text-align: center; color: var(--text-dim); font-size: .82em; padding: 24px; }
+
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="dot" aria-hidden="true"></span>
+    <span>AccessLearn AI<small>Accessible classroom learning</small></span>
+  </div>
+  <div class="row">
+    <span id="provider-badge" class="badge">checking…</span>
+    <span id="user-badge" class="badge hidden"></span>
+    <button id="btn-accessibility" class="ghost" aria-expanded="false" aria-controls="panel-accessibility">Accessibility</button>
+    <button id="btn-logout" class="ghost hidden">Sign out</button>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- Accessibility panel -->
+  <section id="panel-accessibility" class="card hidden" aria-label="Accessibility settings">
+    <h2>Accessibility</h2>
+    <div class="row">
+      <div class="field" style="min-width:200px">
+        <label for="font-scale">Text size</label>
+        <input id="font-scale" type="range" min="0.9" max="1.8" step="0.1" value="1" />
+      </div>
+      <div class="field" style="min-width:200px">
+        <label for="tts-rate">Reading speed</label>
+        <input id="tts-rate" type="range" min="0.6" max="1.6" step="0.1" value="1" />
+      </div>
+      <div class="field" style="min-width:180px">
+        <label for="opt-contrast">Display</label>
+        <div class="row">
+          <label class="row" style="gap:6px"><input id="opt-contrast" type="checkbox" style="width:auto;min-height:auto" /> High contrast</label>
+          <label class="row" style="gap:6px"><input id="opt-motion" type="checkbox" style="width:auto;min-height:auto" /> Reduce motion</label>
+        </div>
+      </div>
+    </div>
+    <p class="hint">Keyboard: <kbd>Alt</kbd>+<kbd>R</kbd> start/stop recording · <kbd>Alt</kbd>+<kbd>S</kbd> summary · <kbd>Alt</kbd>+<kbd>P</kbd> read aloud · <kbd>Esc</kbd> stop reading.</p>
+  </section>
+
+  <!-- Sign in -->
+  <section id="view-auth" class="card" aria-label="Sign in">
+    <h2>Sign in to AccessLearn AI</h2>
+    <div class="grid two">
+      <div>
+        <div class="field">
+          <label for="auth-email">Email</label>
+          <input id="auth-email" type="email" autocomplete="email" placeholder="teacher@school.edu" />
+        </div>
+        <div class="field">
+          <label for="auth-password">Password (minimum 8 characters)</label>
+          <input id="auth-password" type="password" autocomplete="current-password" />
+        </div>
+        <div class="field">
+          <label for="auth-name">Full name (new accounts only)</label>
+          <input id="auth-name" type="text" autocomplete="name" />
+        </div>
+        <div class="row">
+          <button id="btn-login" class="primary">Sign in</button>
+          <button id="btn-register">Create account</button>
+        </div>
+      </div>
+      <div>
+        <p class="hint">AccessLearn AI turns a live lecture into captions, translated captions, a searchable transcript, summaries at four reading levels, notes and audio playback.</p>
+        <p class="hint">Live speech recognition and read-aloud run inside your browser, so lecture audio does not leave your device and there is no per-minute cost.</p>
+      </div>
+    </div>
+    <p id="auth-message" class="notice error hidden" role="alert"></p>
+  </section>
+
+  <!-- Dashboard -->
+  <section id="view-dashboard" class="card hidden" aria-label="Your lectures">
+    <div class="row spread">
+      <h2>Your lectures</h2>
+      <div class="row">
+        <button id="btn-demo">Load sample lecture</button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="field" style="flex:1 1 320px">
+        <label for="new-title">New lecture title</label>
+        <input id="new-title" placeholder="Class 8 — The Water Cycle" />
+      </div>
+      <div class="field" style="width:170px">
+        <label for="new-language">Spoken language</label>
+        <select id="new-language">
+          <option value="en-IN">English (India)</option>
+          <option value="en-US">English (US)</option>
+          <option value="hi-IN">Hindi</option>
+        </select>
+      </div>
+      <div class="field" style="width:150px">
+        <label>&nbsp;</label>
+        <button id="btn-create" class="primary" style="width:100%">Start new</button>
+      </div>
+    </div>
+    <ul id="lecture-list" class="clean"></ul>
+  </section>
+
+  <!-- Lecture workspace -->
+  <section id="view-lecture" class="hidden" aria-label="Lecture workspace">
+    <div class="card">
+      <div class="row spread">
+        <div>
+          <h2 id="lecture-title" style="margin-bottom:4px">Lecture</h2>
+          <div class="row">
+            <span id="lecture-status" class="badge">created</span>
+            <span id="lecture-demo" class="badge demo hidden">Sample content</span>
+            <span id="asr-support" class="badge"></span>
+          </div>
+        </div>
+        <div class="row">
+          <button id="btn-back" class="ghost">← All lectures</button>
+          <button id="btn-record" class="primary">● Start recording</button>
+          <button id="btn-stop" class="danger" disabled>■ Stop</button>
+        </div>
+      </div>
+
+      <h3 id="caption-heading">Live captions</h3>
+      <div id="caption-box" class="caption-box" role="region" aria-live="polite" aria-atomic="false" aria-labelledby="caption-heading">
+        <span class="hint">Captions will appear here once recording starts.</span>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <label class="row" style="gap:6px;margin:0"><input id="opt-translate-live" type="checkbox" style="width:auto;min-height:auto" /> Show translation</label>
+        <select id="translate-language" style="width:auto">
+          <option value="hi">Hindi</option>
+          <option value="en">English</option>
+          <option value="es">Spanish</option>
+          <option value="fr">French</option>
+          <option value="de">German</option>
+          <option value="zh">Mandarin</option>
+        </select>
+        <button id="btn-translate">Translate transcript</button>
+        <button id="btn-speak">▶ Read aloud</button>
+        <button id="btn-speak-stop" class="ghost">■ Stop reading</button>
+      </div>
+      <p id="translate-note" class="notice hidden" role="status"></p>
+    </div>
+
+    <div class="grid two" style="margin-top:18px">
+      <div class="card">
+        <div class="tabs" role="tablist">
+          <button role="tab" aria-selected="true" data-tab="transcript">Transcript</button>
+          <button role="tab" aria-selected="false" data-tab="summary">Summary</button>
+          <button role="tab" aria-selected="false" data-tab="notes">Notes</button>
+        </div>
+
+        <div id="tab-transcript">
+          <div class="field">
+            <label for="search-box">Search this transcript</label>
+            <input id="search-box" type="search" placeholder="Type a word, for example: condensation" />
+          </div>
+          <div id="transcript" class="transcript" aria-live="polite"></div>
+          <div class="row" style="margin-top:12px">
+            <button data-export="txt">Export TXT</button>
+            <button data-export="srt">Export SRT</button>
+            <button data-export="csv">Export CSV</button>
+          </div>
+        </div>
+
+        <div id="tab-summary" class="hidden">
+          <div class="row">
+            <div class="field" style="width:170px">
+              <label for="summary-level">Reading level</label>
+              <select id="summary-level">
+                <option value="elementary">Elementary</option>
+                <option value="middle_school">Middle school</option>
+                <option value="high_school" selected>High school</option>
+                <option value="academic">Academic</option>
+              </select>
+            </div>
+            <div class="field" style="width:150px">
+              <label for="summary-type">Length</label>
+              <select id="summary-type">
+                <option value="short">Short</option>
+                <option value="detailed">Detailed</option>
+              </select>
+            </div>
+            <div class="field" style="width:160px">
+              <label>&nbsp;</label>
+              <button id="btn-summary" class="primary" style="width:100%">Generate</button>
+            </div>
+          </div>
+          <div id="summary-output"><p class="hint">Generate a summary once some speech has been finalised.</p></div>
+        </div>
+
+        <div id="tab-notes" class="hidden">
+          <div class="field">
+            <label for="notes-area">Lecture notes</label>
+            <textarea id="notes-area" placeholder="Notes are drafted from the transcript; edit them freely."></textarea>
+          </div>
+          <div class="row">
+            <button id="btn-notes-save" class="primary">Save notes</button>
+            <button id="btn-notes-refresh">Refresh draft</button>
+          </div>
+          <div id="notes-keywords" class="row" style="margin-top:12px"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Lecture status</h2>
+        <ul class="clean">
+          <li class="row spread"><span>Finalised segments</span><strong id="stat-segments">0</strong></li>
+          <li class="row spread"><span>Words captured</span><strong id="stat-words">0</strong></li>
+          <li class="row spread"><span>Translated</span><strong id="stat-translated">0</strong></li>
+          <li class="row spread"><span>Live connection</span><strong id="stat-ws">closed</strong></li>
+        </ul>
+        <h3>Upload recorded audio</h3>
+        <div class="field">
+          <input id="audio-file" type="file" accept="audio/*" />
+        </div>
+        <button id="btn-upload">Upload audio</button>
+        <p class="hint" style="margin-top:10px">Uploaded audio is stored securely against this lecture. Transcribing a file needs a speech engine configured in <code>.env</code>; live microphone captions work without one.</p>
+      </div>
+    </div>
+  </section>
+
+  <p id="toast" class="notice hidden" role="status" style="margin-top:18px"></p>
+</main>
+
+<footer>AccessLearn AI · modular-monolith build · captions and read-aloud run in your browser</footer>
+<script>
+/* AccessLearn AI — browser client.
+   Live speech recognition and text-to-speech use the browser's own engines,
+   so lecture audio never leaves the device and there is no per-minute cost. */
+
+const $ = (id) => document.getElementById(id);
+const api = {
+  token: localStorage.getItem("al_token") || "",
+  async call(path, { method = "GET", body, raw = false } = {}) {
+    const headers = {};
+    if (this.token) headers.Authorization = `Bearer ${this.token}`;
+    if (body && !(body instanceof FormData)) headers["Content-Type"] = "application/json";
+    const res = await fetch(path, {
+      method,
+      headers,
+      body: body instanceof FormData ? body : body ? JSON.stringify(body) : undefined,
+    });
+    if (raw) return res;
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.detail || `Request failed (${res.status})`);
+    return data;
+  },
+};
+
+const state = {
+  user: null,
+  lecture: null,
+  segments: [],
+  socket: null,
+  recognition: null,
+  recording: false,
+  sequence: 0,
+  interimRevision: 0,
+  sessionStart: 0,
+  prefs: { font_scale: 1, high_contrast: false, tts_rate: 1, reduce_motion: false },
+};
+
+/* ---------------- helpers ---------------- */
+function toast(message, isError = false) {
+  const el = $("toast");
+  el.textContent = message;
+  el.classList.remove("hidden");
+  el.classList.toggle("error", isError);
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => el.classList.add("hidden"), 6000);
+}
+
+function escapeHtml(text) {
+  return String(text ?? "").replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+function timestamp(ms) {
+  const total = Math.max(0, Math.floor(ms / 1000));
+  return `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
+}
+
+function show(view) {
+  ["view-auth", "view-dashboard", "view-lecture"].forEach((id) =>
+    $(id).classList.toggle("hidden", id !== view));
+}
+
+/* ---------------- accessibility ---------------- */
+function applyPrefs() {
+  document.documentElement.style.setProperty("--font-scale", state.prefs.font_scale);
+  document.documentElement.dataset.contrast = state.prefs.high_contrast ? "high" : "normal";
+  document.documentElement.dataset.motion = state.prefs.reduce_motion ? "reduce" : "normal";
+  $("font-scale").value = state.prefs.font_scale;
+  $("tts-rate").value = state.prefs.tts_rate;
+  $("opt-contrast").checked = state.prefs.high_contrast;
+  $("opt-motion").checked = state.prefs.reduce_motion;
+}
+
+async function savePrefs() {
+  applyPrefs();
+  localStorage.setItem("al_prefs", JSON.stringify(state.prefs));
+  if (state.user) {
+    try {
+      await api.call("/api/v1/me/preferences", {
+        method: "PUT",
+        body: {
+          font_scale: state.prefs.font_scale,
+          high_contrast: state.prefs.high_contrast,
+          caption_language: "en",
+          translation_language: $("translate-language").value,
+          reading_level: $("summary-level").value,
+          tts_rate: state.prefs.tts_rate,
+          reduce_motion: state.prefs.reduce_motion,
+        },
+      });
+    } catch { /* preferences are a convenience; never block the lecture */ }
+  }
+}
+
+/* ---------------- auth ---------------- */
+async function authenticate(kind) {
+  const email = $("auth-email").value.trim();
+  const password = $("auth-password").value;
+  if (!email || password.length < 8) {
+    return authError("Enter an email address and a password of at least 8 characters.");
+  }
+  try {
+    const path = kind === "register" ? "/api/v1/auth/register" : "/api/v1/auth/login";
+    const body = kind === "register"
+      ? { email, password, full_name: $("auth-name").value.trim(), role: "teacher" }
+      : { email, password };
+    const data = await api.call(path, { method: "POST", body });
+    api.token = data.access_token;
+    localStorage.setItem("al_token", data.access_token);
+    state.user = data;
+    $("auth-message").classList.add("hidden");
+    await afterLogin();
+  } catch (err) {
+    authError(err.message);
+  }
+}
+
+function authError(message) {
+  const el = $("auth-message");
+  el.textContent = message;
+  el.classList.remove("hidden");
+}
+
+async function afterLogin() {
+  $("user-badge").textContent = state.user?.email || "signed in";
+  $("user-badge").classList.remove("hidden");
+  $("btn-logout").classList.remove("hidden");
+  try {
+    const prefs = await api.call("/api/v1/me/preferences");
+    state.prefs = { ...state.prefs, ...prefs };
+    applyPrefs();
+  } catch { /* use local defaults */ }
+  await loadLectures();
+  show("view-dashboard");
+}
+
+function logout() {
+  stopRecording();
+  api.token = "";
+  state.user = null;
+  localStorage.removeItem("al_token");
+  $("user-badge").classList.add("hidden");
+  $("btn-logout").classList.add("hidden");
+  show("view-auth");
+}
+
+/* ---------------- lectures ---------------- */
+async function loadLectures() {
+  const lectures = await api.call("/api/v1/lectures");
+  const list = $("lecture-list");
+  if (!lectures.length) {
+    list.innerHTML = `<li class="hint">No lectures yet. Create one above, or load the sample lecture.</li>`;
+    return;
+  }
+  list.innerHTML = lectures.map((l) => `
+    <li class="row spread">
+      <div>
+        <strong>${escapeHtml(l.title)}</strong>
+        <div class="hint">${new Date(l.created_at).toLocaleString()} · ${escapeHtml(l.source_language)}</div>
+      </div>
+      <div class="row">
+        ${l.is_demo ? '<span class="badge demo">Sample</span>' : ""}
+        <span class="badge">${escapeHtml(l.status)}</span>
+        <button data-open="${l.id}">Open</button>
+      </div>
+    </li>`).join("");
+  list.querySelectorAll("[data-open]").forEach((btn) =>
+    btn.addEventListener("click", () => openLecture(Number(btn.dataset.open))));
+}
+
+async function createLecture() {
+  const title = $("new-title").value.trim();
+  if (!title) return toast("Give the lecture a title first.", true);
+  const lecture = await api.call("/api/v1/lectures", {
+    method: "POST",
+    body: { title, source_language: $("new-language").value, is_demo: false },
+  });
+  $("new-title").value = "";
+  await loadLectures();
+  openLecture(lecture.id);
+}
+
+async function loadDemo() {
+  const data = await api.call("/api/v1/demo/lecture", { method: "POST" });
+  toast(data.notice);
+  await loadLectures();
+  openLecture(data.lecture_id);
+}
+
+async function openLecture(id) {
+  const lecture = await api.call(`/api/v1/lectures/${id}`);
+  state.lecture = lecture;
+  state.sequence = 0;
+  $("lecture-title").textContent = lecture.title;
+  $("lecture-status").textContent = lecture.status;
+  $("lecture-demo").classList.toggle("hidden", !lecture.is_demo);
+  $("caption-box").innerHTML = `<span class="hint">Captions will appear here once recording starts.</span>`;
+  $("summary-output").innerHTML = `<p class="hint">Generate a summary once some speech has been finalised.</p>`;
+  show("view-lecture");
+  await refreshTranscript();
+  await loadNotes();
+  connectSocket(id);
+}
+
+/* ---------------- live websocket ---------------- */
+function connectSocket(lectureId) {
+  if (state.socket) { state.socket.close(); state.socket = null; }
+  const scheme = location.protocol === "https:" ? "wss" : "ws";
+  const socket = new WebSocket(
+    `${scheme}://${location.host}/ws/lectures/${lectureId}/live?token=${encodeURIComponent(api.token)}`);
+  socket.onopen = () => { $("stat-ws").textContent = "connected"; };
+  socket.onclose = () => { $("stat-ws").textContent = "closed"; };
+  socket.onerror = () => { $("stat-ws").textContent = "error"; };
+  socket.onmessage = (event) => {
+    const message = JSON.parse(event.data);
+    if (message.type === "interim_caption") renderCaption(message.text, true);
+    if (message.type === "final_segment") {
+      if (!state.segments.some((s) => s.id === message.segment.id)) {
+        state.segments.push(message.segment);
+        renderTranscript();
+      }
+      renderCaption(message.segment.text, false);
+    }
+    if (message.type === "lecture_status") $("lecture-status").textContent = message.status;
+  };
+  state.socket = socket;
+}
+
+/* ---------------- speech recognition ---------------- */
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+function initRecognition() {
+  if (!SpeechRecognition) return null;
+  const recognition = new SpeechRecognition();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = state.lecture?.source_language || "en-IN";
+
+  recognition.onresult = (event) => {
+    let interim = "";
+    for (let i = event.resultIndex; i < event.results.length; i += 1) {
+      const result = event.results[i];
+      const text = result[0].transcript.trim();
+      if (!text) continue;
+      if (result.isFinal) {
+        sendFinalSegment(text, result[0].confidence || 0);
+      } else {
+        interim += `${text} `;
+      }
+    }
+    if (interim.trim()) sendInterim(interim.trim());
+  };
+
+  recognition.onerror = (event) => {
+    if (event.error === "no-speech") return;
+    toast(`Speech recognition: ${event.error}`, true);
+  };
+
+  recognition.onend = () => {
+    // Browsers stop the engine periodically; restart while the user is recording.
+    if (state.recording) { try { recognition.start(); } catch { /* already starting */ } }
+  };
+  return recognition;
+}
+
+function sendInterim(text) {
+  renderCaption(text, true);
+  state.interimRevision += 1;
+  if (state.socket?.readyState === WebSocket.OPEN) {
+    state.socket.send(JSON.stringify({ type: "interim", text, revision: state.interimRevision }));
+  }
+}
+
+async function sendFinalSegment(text, confidence) {
+  const elapsed = Date.now() - state.sessionStart;
+  const sequence = state.sequence++;
+  const payload = {
+    // A stable id per segment: the same id can be retried safely and is still stored once.
+    client_segment_id: `${state.lecture.id}-${state.sessionStart}-${sequence}`,
+    sequence_no: nextSequenceNo(),
+    text,
+    language: (state.lecture.source_language || "en").slice(0, 2),
+    start_ms: Math.max(0, elapsed - 4000),
+    end_ms: elapsed,
+    confidence,
+    is_final: true,
+  };
+  try {
+    await api.call(`/api/v1/lectures/${state.lecture.id}/segments`, { method: "POST", body: payload });
+  } catch (err) {
+    toast(`Could not save a caption: ${err.message}`, true);
+  }
+}
+
+function nextSequenceNo() {
+  const highest = state.segments.reduce((max, s) => Math.max(max, s.sequence_no), -1);
+  return highest + 1;
+}
+
+async function startRecording() {
+  if (!state.lecture) return;
+  if (!SpeechRecognition) {
+    return toast("This browser has no built-in speech recognition. Chrome or Edge is needed for live captions; audio upload still works.", true);
+  }
+  state.recognition = state.recognition || initRecognition();
+  state.recording = true;
+  state.sessionStart = Date.now();
+  try { state.recognition.start(); } catch { /* already running */ }
+  $("btn-record").disabled = true;
+  $("btn-stop").disabled = false;
+  await api.call(`/api/v1/lectures/${state.lecture.id}/status`, { method: "PUT", body: { status: "live" } });
+  $("lecture-status").textContent = "live";
+  $("lecture-status").classList.add("live");
+  toast("Recording. Speak normally — captions appear as you go.");
+}
+
+async function stopRecording() {
+  if (!state.recording) return;
+  state.recording = false;
+  try { state.recognition?.stop(); } catch { /* ignore */ }
+  $("btn-record").disabled = false;
+  $("btn-stop").disabled = true;
+  $("lecture-status").classList.remove("live");
+  if (state.lecture) {
+    await api.call(`/api/v1/lectures/${state.lecture.id}/status`, { method: "PUT", body: { status: "completed" } });
+    $("lecture-status").textContent = "completed";
+  }
+}
+
+/* ---------------- rendering ---------------- */
+function renderCaption(text, isInterim) {
+  $("caption-box").innerHTML =
+    `<span class="${isInterim ? "interim" : "final"}">${escapeHtml(text)}</span>`;
+}
+
+function renderTranscript() {
+  const query = $("search-box").value.trim();
+  const container = $("transcript");
+  const showTranslation = $("opt-translate-live").checked;
+  const language = $("translate-language").value;
+
+  const visible = query
+    ? state.segments.filter((s) => s.text.toLowerCase().includes(query.toLowerCase()))
+    : state.segments;
+
+  if (!visible.length) {
+    container.innerHTML = `<p class="hint">${query ? "No match in this transcript." : "Nothing finalised yet."}</p>`;
+  } else {
+    container.innerHTML = visible.map((s) => {
+      let text = escapeHtml(s.text);
+      if (query) {
+        text = text.replace(new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi"),
+          "<mark>$1</mark>");
+      }
+      const translation = showTranslation && s.translations?.[language]
+        ? `<span class="translated">${escapeHtml(s.translations[language])}</span>` : "";
+      return `<div class="segment"><span class="time">${timestamp(s.start_ms)}</span><div>${text}${translation}</div></div>`;
+    }).join("");
+    if (state.recording) container.scrollTop = container.scrollHeight;
+  }
+
+  $("stat-segments").textContent = state.segments.length;
+  $("stat-words").textContent = state.segments.reduce((n, s) => n + s.text.split(/\s+/).filter(Boolean).length, 0);
+  $("stat-translated").textContent = state.segments.filter((s) => Object.keys(s.translations || {}).length).length;
+}
+
+async function refreshTranscript() {
+  const data = await api.call(`/api/v1/lectures/${state.lecture.id}/transcript`);
+  state.segments = data.segments;
+  renderTranscript();
+}
+
+/* ---------------- AI actions ---------------- */
+async function translateTranscript() {
+  if (!state.segments.length) return toast("Nothing to translate yet.", true);
+  const language = $("translate-language").value;
+  const result = await api.call(`/api/v1/lectures/${state.lecture.id}/translate`, {
+    method: "POST", body: { target_language: language },
+  });
+  const note = $("translate-note");
+  if (result.is_sample_output) {
+    note.textContent = result.note;
+    note.classList.remove("hidden");
+  } else {
+    note.classList.add("hidden");
+  }
+  $("opt-translate-live").checked = true;
+  await refreshTranscript();
+  toast(`Translated ${result.translated_count} segment(s) into ${language}.`);
+}
+
+async function generateSummary() {
+  if (!state.segments.length) return toast("Nothing finalised to summarise yet.", true);
+  $("btn-summary").disabled = true;
+  try {
+    const summary = await api.call(`/api/v1/lectures/${state.lecture.id}/summarize`, {
+      method: "POST",
+      body: {
+        summary_type: $("summary-type").value,
+        reading_level: $("summary-level").value,
+        force: true,
+      },
+    });
+    $("summary-output").innerHTML = `
+      <p>${escapeHtml(summary.content)}</p>
+      ${summary.key_points?.length ? `<h3>Key points</h3><ul class="clean">${summary.key_points.map((p) => `<li>• ${escapeHtml(p)}</li>`).join("")}</ul>` : ""}
+      ${summary.definitions?.length ? `<h3>Important terms</h3><ul class="clean">${summary.definitions.map((d) => `<li><strong>${escapeHtml(d.term)}</strong> — ${escapeHtml(d.meaning)}</li>`).join("")}</ul>` : ""}
+      ${summary.questions?.length ? `<h3>Questions to revise</h3><ul class="clean">${summary.questions.map((q) => `<li>${escapeHtml(q)}</li>`).join("")}</ul>` : ""}
+      <p class="hint">Built from ${summary.segments_covered} finalised segment(s) · engine: ${escapeHtml(summary.provider)}</p>`;
+  } finally {
+    $("btn-summary").disabled = false;
+  }
+}
+
+async function loadNotes() {
+  const note = await api.call(`/api/v1/lectures/${state.lecture.id}/notes`);
+  $("notes-area").value = note.content;
+  $("notes-keywords").innerHTML = (note.keywords || [])
+    .map((k) => `<span class="badge">${escapeHtml(k)}</span>`).join("");
+}
+
+async function saveNotes() {
+  await api.call(`/api/v1/lectures/${state.lecture.id}/notes`, {
+    method: "PUT", body: { content: $("notes-area").value },
+  });
+  await loadNotes();
+  toast("Notes saved.");
+}
+
+async function exportTranscript(format) {
+  const language = $("opt-translate-live").checked ? `&language=${$("translate-language").value}` : "";
+  const res = await api.call(
+    `/api/v1/lectures/${state.lecture.id}/export?format=${format}${language}`, { raw: true });
+  if (!res.ok) return toast("Export failed.", true);
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `${state.lecture.title.replace(/[^\w\- ]+/g, "_")}.${format}`;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+async function uploadAudio() {
+  const file = $("audio-file").files[0];
+  if (!file) return toast("Choose an audio file first.", true);
+  const form = new FormData();
+  form.append("file", file);
+  try {
+    const data = await api.call(`/api/v1/lectures/${state.lecture.id}/audio`, { method: "POST", body: form });
+    toast(data.next_step);
+  } catch (err) {
+    toast(err.message, true);
+  }
+}
+
+/* ---------------- text to speech ---------------- */
+function speak() {
+  if (!("speechSynthesis" in window)) return toast("This browser cannot read text aloud.", true);
+  const activeTab = document.querySelector('[role="tab"][aria-selected="true"]').dataset.tab;
+  let text = "";
+  if (activeTab === "transcript") text = state.segments.map((s) => s.text).join(" ");
+  if (activeTab === "summary") text = $("summary-output").innerText;
+  if (activeTab === "notes") text = $("notes-area").value;
+  if (!text.trim()) return toast("Nothing to read out yet.", true);
+
+  speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.rate = Number(state.prefs.tts_rate) || 1;
+  utterance.lang = (state.lecture?.source_language || "en-IN");
+  speechSynthesis.speak(utterance);
+}
+
+/* ---------------- wiring ---------------- */
+function switchTab(name) {
+  document.querySelectorAll('[role="tab"]').forEach((btn) =>
+    btn.setAttribute("aria-selected", String(btn.dataset.tab === name)));
+  ["transcript", "summary", "notes"].forEach((tab) =>
+    $(`tab-${tab}`).classList.toggle("hidden", tab !== name));
+}
+
+function wire() {
+  $("btn-login").onclick = () => authenticate("login");
+  $("btn-register").onclick = () => authenticate("register");
+  $("btn-logout").onclick = logout;
+  $("btn-create").onclick = () => createLecture().catch((e) => toast(e.message, true));
+  $("btn-demo").onclick = () => loadDemo().catch((e) => toast(e.message, true));
+  $("btn-back").onclick = async () => { await stopRecording(); await loadLectures(); show("view-dashboard"); };
+  $("btn-record").onclick = () => startRecording().catch((e) => toast(e.message, true));
+  $("btn-stop").onclick = () => stopRecording().catch((e) => toast(e.message, true));
+  $("btn-translate").onclick = () => translateTranscript().catch((e) => toast(e.message, true));
+  $("btn-summary").onclick = () => generateSummary().catch((e) => toast(e.message, true));
+  $("btn-notes-save").onclick = () => saveNotes().catch((e) => toast(e.message, true));
+  $("btn-notes-refresh").onclick = () => loadNotes().catch((e) => toast(e.message, true));
+  $("btn-upload").onclick = uploadAudio;
+  $("btn-speak").onclick = speak;
+  $("btn-speak-stop").onclick = () => speechSynthesis.cancel();
+  $("search-box").oninput = renderTranscript;
+  $("opt-translate-live").onchange = renderTranscript;
+  $("translate-language").onchange = renderTranscript;
+
+  document.querySelectorAll('[role="tab"]').forEach((btn) =>
+    btn.addEventListener("click", () => switchTab(btn.dataset.tab)));
+  document.querySelectorAll("[data-export]").forEach((btn) =>
+    btn.addEventListener("click", () => exportTranscript(btn.dataset.export)));
+
+  $("btn-accessibility").onclick = () => {
+    const panel = $("panel-accessibility");
+    const open = panel.classList.toggle("hidden");
+    $("btn-accessibility").setAttribute("aria-expanded", String(!open));
+  };
+  $("font-scale").oninput = (e) => { state.prefs.font_scale = Number(e.target.value); savePrefs(); };
+  $("tts-rate").oninput = (e) => { state.prefs.tts_rate = Number(e.target.value); savePrefs(); };
+  $("opt-contrast").onchange = (e) => { state.prefs.high_contrast = e.target.checked; savePrefs(); };
+  $("opt-motion").onchange = (e) => { state.prefs.reduce_motion = e.target.checked; savePrefs(); };
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") speechSynthesis.cancel();
+    if (!event.altKey) return;
+    const key = event.key.toLowerCase();
+    if (key === "r") { event.preventDefault(); state.recording ? stopRecording() : startRecording(); }
+    if (key === "s") { event.preventDefault(); switchTab("summary"); generateSummary(); }
+    if (key === "p") { event.preventDefault(); speak(); }
+  });
+}
+
+async function boot() {
+  wire();
+  const saved = localStorage.getItem("al_prefs");
+  if (saved) { try { state.prefs = { ...state.prefs, ...JSON.parse(saved) }; } catch { /* ignore */ } }
+  applyPrefs();
+
+  $("asr-support").textContent = SpeechRecognition
+    ? "Live captions supported" : "No live captions in this browser";
+
+  try {
+    const health = await api.call("/health");
+    $("provider-badge").textContent =
+      `speech: ${health.providers.asr} · translate: ${health.providers.translation} · summary: ${health.providers.llm}`;
+  } catch {
+    $("provider-badge").textContent = "server unreachable";
+  }
+
+  if (api.token) {
+    try {
+      await api.call("/api/v1/me/preferences");
+      state.user = { email: "signed in" };
+      await afterLogin();
+      return;
+    } catch { localStorage.removeItem("al_token"); api.token = ""; }
+  }
+  show("view-auth");
+}
+
+boot();
+
+</script>
+</body>
+</html>
